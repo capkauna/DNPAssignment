@@ -8,4 +8,9 @@ public class CliApp
     {
 
     }
+
+    public Task StartAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
