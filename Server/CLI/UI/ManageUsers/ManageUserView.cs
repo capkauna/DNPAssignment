@@ -28,16 +28,16 @@ public class ManageUserView
         switch (choice)
         {
             case "1":
-                //await _createUserView.ShowAsync();
-                UiHelper.Pause();
+                await cuv.ShowAsync();
+                //UiHelper.Pause();
                 break;
             case "2":
-                //await _listUsersView.ShowAsync();
-                UiHelper.Pause();
+                await luv.ShowAsync();
+                //UiHelper.Pause();
                 break;
             case "3":
-                //await _singleUserView.PromptAndShowAsync();
-                UiHelper.Pause();
+                await suv.PromptAndShowAsync();
+                //UiHelper.Pause();
                 break;
             case "0":
                 return;
