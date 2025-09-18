@@ -16,8 +16,7 @@ public class ListUsersView
 
         if (users.Count == 0)
         {
-            Console.WriteLine("No users found.");
-            UiHelper.Pause("Press any key to continue...");
+            UiHelper.Pause("No users found. Press any key to continue...");
             return Task.CompletedTask;
         }
         foreach (var u in users)

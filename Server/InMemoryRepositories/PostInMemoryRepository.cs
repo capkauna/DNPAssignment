@@ -19,12 +19,19 @@ public class PostInMemoryRepository: IPostRepository
     public Task UpdateAsync(Post post)
     {
         Post ? existingPost = posts.SingleOrDefault(p => p.Id == post.Id);
-        if (existingPost != null)
+        if (existingPost == null)
         {
             throw new InvalidOperationException($"Post with ID '{post.Id}' not found");
         }
         posts.Remove(existingPost);
         posts.Add(post);
+        /*
+         //safer: updating fields in place
+            existingPost.Title = post.Title;
+            existingPost.Body = post.Body;
+            existingPost.UserId = post.UserId;
+            existingPost.Comments = post.Comments;
+         */
         return Task.CompletedTask;
     }
 
@@ -41,11 +48,10 @@ public class PostInMemoryRepository: IPostRepository
 
     public Task<Post> GetSingleAsync(int id)
     {
-        Post ? post = posts.SingleOrDefault(p => p.Id == id);
-        if (post is null)
-        {
+        Post ? post = posts.SingleOrDefault(p => p.Id == id)
+            ??
             throw new InvalidOperationException($"Post with ID '{id}' not found");
-        }
+
         return Task.FromResult(post);
     }
 

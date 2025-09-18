@@ -1,4 +1,5 @@
-﻿using CLI.UI.ManageUsers;
+﻿using CLI.UI.ManagePosts;
+using CLI.UI.ManageUsers;
 using CLI.UI.utils;
 using RepositoryContracts;
 
@@ -7,23 +8,21 @@ namespace CLI.UI;
 public class CliApp
 {
     private readonly IUserRepository ur;
-    private readonly ICommentRepository cr;
     private readonly IPostRepository pr;
+    private readonly ICommentRepository cr;
 
     private readonly ManageUserView muv;
-    //private readonly ManagePostView mpv;
-    //private readonly ManageCommentView mcv;
+    private readonly ManagePostView mpv;
 
-    public CliApp(IUserRepository ur, ICommentRepository cr, IPostRepository pr)
+    public CliApp(IUserRepository ur, IPostRepository pr, ICommentRepository cr)
     {
         this.ur = ur;
-        this.cr = cr;
         this.pr = pr;
+        this.cr = cr;
 
             //submenus
             muv = new ManageUserView(ur);
-            //mpv = new ManagePostView(pr);
-            //mcv = new ManageCommentView(cr);
+            mpv = new ManagePostView(pr, cr);
 
     }
 
@@ -33,7 +32,7 @@ public class CliApp
         {
             Console.Clear();
             Console.WriteLine("Choose an option:");
-            Console.WriteLine("1. Manage Users \n2. Manage Posts \n3. Manage Comments \n0. Exit");
+            Console.WriteLine("1. Manage Users \n2. Manage Posts \n0. Exit");
             Console.Write("Choice: ");
             var choice = Console.ReadLine();
 
@@ -43,13 +42,10 @@ public class CliApp
                     await muv.ShowAsync();
                     break;
                 case "2":
-                    //await mpv.ShowAsync();
-                    UiHelper.Pause("Not yet implemented. Press any key to continue...");
+                    await mpv.ShowAsync();
+                    //UiHelper.Pause("Not yet implemented. Press any key to continue...");
                     break;
-                case "3":
-                   // await mcv.ShowAsync();
-                    UiHelper.Pause("Not yet implemented. Press any key to continue...");
-                    break;
+
                 case "0":
                     return;
                 default:

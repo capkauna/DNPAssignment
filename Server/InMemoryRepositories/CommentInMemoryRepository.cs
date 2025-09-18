@@ -7,6 +7,7 @@ public class CommentInMemoryRepository : ICommentRepository
 {
     public List<Comment> comments = new();
 
+
     public Task<Comment> AddAsync(Comment comment)
     {
         comment.Id = comments.Any() ? comments.Max(c => c.Id) + 1 : 1;
@@ -22,6 +23,14 @@ public class CommentInMemoryRepository : ICommentRepository
         }
         comments.Remove(existingComment);
         comments.Add(comment);
+
+        /*
+         * // Option B (safer): updating fields in place
+        existingComment.Body = comment.Body;
+        existingComment.UserId = comment.UserId;
+        existingComment.PostId = comment.PostId;
+        existingComment.Comments = comment.Comments;
+         */
         return Task.CompletedTask;
     }
 
@@ -30,7 +39,7 @@ public class CommentInMemoryRepository : ICommentRepository
         Comment? commentToRemove = comments.SingleOrDefault(c => c.Id == id);
         if (commentToRemove is null)
         {
-            throw new InvalidOperationException($"User with ID '{id}' not found");
+            throw new InvalidOperationException($"Comment with ID '{id}' not found");
         }
         comments.Remove(commentToRemove);
         return Task.CompletedTask;
@@ -46,8 +55,10 @@ public class CommentInMemoryRepository : ICommentRepository
         }
         return Task.FromResult(comment);
     }
-    public IQueryable<Comment> GetManyAsync()
+    public IQueryable<Comment> GetManyAsync(int postId)
     {
-        return comments.AsQueryable();
+        return comments.Where(c => c.PostId == postId).AsQueryable();
     }
+
+
 }

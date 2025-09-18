@@ -14,7 +14,7 @@ public class Subforum
         this.postId = post.Id;
     }
 
-    public void addPost(Post post)
+    public void AddPost(Post post)
     {
         Posts.Add(post);
     }
