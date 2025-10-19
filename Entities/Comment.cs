@@ -7,6 +7,7 @@ public class Comment
     public int PostId { get; set; }
     public string Body { get; set; }
     public List<Comment> Comments = new();
+    //reconsider (circular reference)
     public HashSet<int> LikedBy { get; set; } = new();
 
     public Comment(int id, int userId, int postId, string body)
