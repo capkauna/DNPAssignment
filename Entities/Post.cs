@@ -11,19 +11,21 @@ public class Post
     public List<Comment> Comments = new();
 
     // Public ctor: caller does NOT set Id (repo/DB will)
-   /* public Post(string title, string body, int userId)
+    //for creating new posts
+    public Post(string title, string body, int userId)
     {
-        Title = Require(title, nameof(title));
-        Body  = Require(body,  nameof(body));
+        Title = title;
+        Body  = body;
         UserId = userId;
     }
-    */
+
    //for UI shenanigans
-   public Post(string title, string body, int id)
+   public Post(string title, string body, int userId, int id)
    {
        //id handled by a database
        Title = title;
        Body = body;
+       UserId = userId;
        Id = id;
    }
     // Optional: repo-only/internal constructor when we need to materialize with Id

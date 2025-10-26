@@ -65,7 +65,8 @@ public class SingleCommentView
                         var updated = new Comment(comment.Id, comment.UserId, comment.PostId, newBody)
                         {
                             // If the Comment exposes nested Replies/Likes to preserve:
-                            Comments = comment.Comments,
+                            //Comments = comment.Comments,
+                            //removed this feature
                             LikedBy = comment.LikedBy
                         };
                         await _comments.UpdateAsync(updated);

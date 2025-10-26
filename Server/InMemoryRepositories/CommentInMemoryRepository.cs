@@ -60,5 +60,10 @@ public class CommentInMemoryRepository : ICommentRepository
         return comments.Where(c => c.PostId == postId).AsQueryable();
     }
 
+    public IQueryable<Comment> GetMany()
+    {
+        //this entire class is now obsolete, so no need to implement this
+        throw new NotImplementedException();
+    }
 
 }

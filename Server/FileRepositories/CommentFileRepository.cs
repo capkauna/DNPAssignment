@@ -111,6 +111,7 @@ public class CommentFileRepository : ICommentRepository
 	    }
 
 	    //method from example, not used in the current implementation
+	    //added to interface for completeness
 	    public IQueryable<Comment> GetMany()
 	    {
 		    string commentsAsJson = File.ReadAllTextAsync(filePath).Result;
