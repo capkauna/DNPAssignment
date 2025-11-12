@@ -12,6 +12,13 @@ public class UserFileRepository : IUserRepository
         JsonHelper.EnsureInitialized(filepath);
     }
 
+    //constructor that takes a specific filepath, to make things more organized
+    public UserFileRepository(string path)
+    {
+        filepath = path;
+        JsonHelper.EnsureInitialized(filepath);
+    }
+
     public async Task<User> AddAsync(User user)
     {
         var users = await JsonHelper.LoadListAsync<User>(filepath);

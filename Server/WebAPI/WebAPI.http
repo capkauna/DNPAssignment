@@ -1,6 +1,90 @@
 @WebAPI_HostAddress = http://localhost:5202
 
-GET {{WebAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+##USERS
+### Get All Users
+GET {{WebAPI_HostAddress}}/users/
+Content-Type: application/json
+
+###Create New User (id will be generated automatically)
+POST {{WebAPI_HostAddress}}/users/
+Content-Type: application/json
+
+{
+  "username": "Pikachu",
+  "password": "zzzzzzzz"
+}
+
+### Get User by ID
+GET {{WebAPI_HostAddress}}/users/1
+Content-Type: application/json
+
+### Update User by ID
+PUT {{WebAPI_HostAddress}}/users/1
+Content-Type: application/json
+{
+  "username": "AshKetchum",
+  "password": "newpassword123"
+}
+### Delete User by ID
+DELETE {{WebAPI_HostAddress}}/users/1
+Content-Type: application/json
+
+##POSTS
+### Get All Posts
+GET {{WebAPI_HostAddress}}/posts/
+Content-Type: application/json
+
+### Create New Post (id will be generated automatically)
+POST {{WebAPI_HostAddress}}/posts/
+Content-Type: application/json
+{
+  "title": "My First Post",
+  "content": "This is the content of my first post.",
+  "userId": 1
+}
+
+### Get Post by ID
+GET {{WebAPI_HostAddress}}/posts/1
+Content-Type: application/json
+
+### Update Post by ID
+PUT {{WebAPI_HostAddress}}/posts/1
+Content-Type: application/json
+{
+  "title": "Updated Post Title",
+  "content": "This is the updated content of my post.",
+  "userId": 1
+}
+
+### Delete Post by ID
+DELETE {{WebAPI_HostAddress}}/posts/1
+Content-Type: application/json
+
+##COMMENTS
+### Get All Comments
+GET {{WebAPI_HostAddress}}/comments/
+Content-Type: application/json
+### Create New Comment (id will be generated automatically)
+POST {{WebAPI_HostAddress}}/comments/
+Content-Type: application/json
+{
+  "postId": 1,
+  "userId": 1,
+  "content": "This is a comment on the post."
+}
+### Get Comment by ID
+GET {{WebAPI_HostAddress}}/comments/1
+Content-Type: application/json
+### Update Comment by ID
+PUT {{WebAPI_HostAddress}}/comments/1
+Content-Type: application/json
+{
+  "postId": 1,
+  "userId": 1,
+  "content": "This is the updated comment on the post."
+}
+### Delete Comment by ID
+DELETE {{WebAPI_HostAddress}}/comments/1
+Content-Type: application/json
 
 ###

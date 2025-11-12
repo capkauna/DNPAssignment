@@ -18,6 +18,17 @@ public class CommentFileRepository : ICommentRepository
 	        }
 		}
 
+	    //constructor that takes a specific filepath, to make things more organized
+	    public CommentFileRepository(string path)
+	    {
+		    filePath = path;
+		    //make sure a file exists
+		    if (!File.Exists(filePath))
+		    {
+			    File.WriteAllText(filePath, "[]");
+		    }
+	    }
+
 	    public async Task<Comment> AddAsync(Comment comment)
 	    //the returned comment will have an ID assigned by the repository
 	    {

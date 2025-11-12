@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+/*
 // Register repositories for dependency injection (using Scoped lifetime) (declare defaults for this instance of usage)
 builder.Services.AddScoped<IPostRepository, PostFileRepository>();
 builder.Services.AddScoped<IUserRepository, UserFileRepository>();
@@ -27,5 +28,32 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+*/
+
+//better version with declared paths
+var dataDir = Path.Combine(builder.Environment.ContentRootPath, "data");
+Directory.CreateDirectory(dataDir);
+
+builder.Services.AddScoped<IUserRepository>(_ =>
+    new UserFileRepository(Path.Combine(dataDir, "users.json")));
+builder.Services.AddScoped<IPostRepository>(_ =>
+    new PostFileRepository(Path.Combine(dataDir, "posts.json")));
+builder.Services.AddScoped<ICommentRepository>(_ =>
+    new CommentFileRepository(Path.Combine(dataDir, "comments.json")));
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+//connecting all controller-based endpoints
+app.MapControllers();
 
 app.Run();

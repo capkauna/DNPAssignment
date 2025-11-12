@@ -19,7 +19,7 @@ public class UsersController : ControllerBase
     }
 
     //Create endpoint
-    [HttpPost] //assigns this method to POST requests
+    [HttpPost("")] //assigns this method to POST requests and explicitly targets the root route ("")
     public async Task<ActionResult<UserDto>> AddUser(
         [FromBody] CreateUserDto request)
     {
@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
            User user = new(request.UserName, request.Password);
            User created = await userRepo.AddAsync(user);
            UserDto dto = new(created.Id, created.UserName);
-           return Created($"/users/{dto.Id}", dto);
+           return CreatedAtAction(nameof(GetUser), new { userName = dto.UserName }, dto);
         }
         catch (Exception ex)
         {
@@ -112,7 +112,7 @@ public class UsersController : ControllerBase
     }
 
     //get all endpoint
-    [HttpGet]
+    [HttpGet("all")] //specifying all so it stops conflicting with the post endpoint
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
         try

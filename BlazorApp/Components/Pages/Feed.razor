@@ -1,0 +1,246 @@
+﻿@page "/feed"
+@using BlazorApp.Services
+@using DTOs
+@using System.ComponentModel.DataAnnotations
+@inject IPostService PostService
+// Inject the interface instead of the concrete class
+
+@rendermode InteractiveServer
+
+<PageTitle>Micro-Blogging Feed</PageTitle>
+
+<div class="container mx-auto p-4 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-6 text-indigo-700">Micro-Blogging Feed</h1>
+    <p class="mb-4 text-sm text-gray-600">
+        You are currently signed in as **@PostService.GetCurrentUserName()** (User ID: @PostService.GetCurrentUserId()).
+    </p>
+
+    <!-- Create New Post Section -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8 border-t-4 border-indigo-500">
+        <h2 class="text-xl font-semibold mb-4 text-indigo-600">Create a New Post</h2>
+        <EditForm Model="@newPostDto" OnValidSubmit="HandleNewPost" FormName="NewPostForm">
+            <DataAnnotationsValidator />
+            <div class="mb-4">
+                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                <InputText id="title" @bind-Value="newPostDto.Title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                <ValidationMessage For="@(() => newPostDto.Title)" class="text-red-500 text-xs" />
+            </div>
+            <div class="mb-4">
+                <label for="body" class="block text-sm font-medium text-gray-700">Content</label>
+                <InputTextArea id="body" @bind-Value="newPostDto.Body" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                <ValidationMessage For="@(() => newPostDto.Body)" class="text-red-500 text-xs" />
+            </div>
+            <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Post
+            </button>
+        </EditForm>
+    </div>
+
+
+    <!-- Post Feed -->
+    @if (posts == null)
+    {
+        <p><em>Loading posts...</em></p>
+    }
+    else if (!posts.Any())
+    {
+        <p class="text-gray-500">No posts available.</p>
+    }
+    else
+    {
+        @foreach (var post in posts)
+        {
+            <div class="bg-white shadow-xl rounded-xl p-6 mb-6 border-l-4 border-green-500 transition-shadow duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-bold mb-2 text-gray-800">@post.Title</h2>
+                <p class="text-gray-700 mb-3">@post.Body</p>
+                <p class="text-xs text-gray-500 mb-4">
+                    Posted by **@post.AuthorName** (ID: @post.UserId)
+                </p>
+
+                <!-- Comment Toggle Button -->
+                <button @onclick="() => ToggleComments(post.Id)" class="text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none">
+                    @(visibleComments.ContainsKey(post.Id) ? "Hide Comments" : "Show Comments") (@commentCounts.GetValueOrDefault(post.Id, 0) comments)
+                </button>
+
+                <!-- Comments Section (Conditionally Rendered) -->
+                @if (visibleComments.ContainsKey(post.Id))
+                {
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-700">Comments:</h4>
+
+                        <!-- List of Comments -->
+                        @if (visibleComments[post.Id].Count == 0)
+                        {
+                            <p class="text-sm text-gray-500">No comments yet. Be the first!</p>
+                        }
+                        else
+                        {
+                            @foreach (var comment in visibleComments[post.Id])
+                            {
+                                <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <p class="text-sm font-medium text-gray-800">@comment.Body</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        — by **@comment.AuthorName** (ID: @comment.UserId)
+                                    </p>
+                                </div>
+                            }
+                        }
+
+                        <!-- Add New Comment Form -->
+                        <div class="mt-4 p-4 bg-indigo-50 rounded-lg">
+                            <h5 class="text-md font-medium mb-2 text-indigo-700">Add a Comment</h5>
+                            <EditForm Model="@newCommentDtos[post.Id]" OnValidSubmit="() => HandleNewComment(post.Id)" FormName="@($"CommentForm_{post.Id}")">
+                                <DataAnnotationsValidator />
+                                <div class="flex space-x-2">
+                                    <div class="flex-grow">
+                                        <InputText @bind-Value="newCommentDtos[post.Id].Body"
+                                                   placeholder="Your comment..."
+                                                   class="w-full rounded-md border-gray-300 shadow-sm p-2 text-sm border focus:ring-indigo-500 focus:border-indigo-500" />
+                                        <ValidationMessage For="@(() => newCommentDtos[post.Id].Body)" class="text-red-500 text-xs block mt-1" />
+                                    </div>
+                                    <button type="submit" class="py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                        Submit
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+
+@code {
+    // Services and Data
+    private IEnumerable<PostDto>? posts;
+    private Dictionary<int, List<CommentDto>> visibleComments = new();
+    private Dictionary<int, int> commentCounts = new();
+
+    // DTO for creating new content
+    private CreatePostDto newPostDto = new();
+    private Dictionary<int, CreateCommentDto> newCommentDtos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPosts();
+    }
+
+    private async Task LoadPosts()
+    {
+        try
+        {
+            posts = (await PostService.GetAllPostsAsync()).ToList();
+
+            if (posts != null)
+            {
+                foreach (var post in posts)
+                {
+                    // Initialize comment DTO model for the form
+                    newCommentDtos[post.Id] = new CreateCommentDto
+                    {
+                        UserId = PostService.GetCurrentUserId(), // Hardcoded User ID
+                        PostId = post.Id
+                    };
+
+                    // Load initial comment counts
+                    var comments = await PostService.GetCommentsByPostIdAsync(post.Id);
+                    commentCounts[post.Id] = comments.Count();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading initial data: {ex.Message}");
+            // Optional: Set posts to an empty list to show the feed is empty/failed to load
+            posts = new List<PostDto>();
+        }
+    }
+
+    private async Task ToggleComments(int postId)
+    {
+        if (visibleComments.ContainsKey(postId))
+        {
+            // Hide comments
+            visibleComments.Remove(postId);
+        }
+        else
+        {
+            // Show and load comments
+            var comments = await PostService.GetCommentsByPostIdAsync(postId);
+            visibleComments.Add(postId, comments.ToList());
+        }
+    }
+
+    private async Task HandleNewPost()
+    {
+        // 1. Set the hardcoded user ID
+        newPostDto.UserId = PostService.GetCurrentUserId();
+
+        // 2. Create the post
+        try
+        {
+            var createdPost = await PostService.CreatePostAsync(newPostDto);
+
+            // Success: Add the newly created post to the top of the list
+            if (posts is List<PostDto> postList)
+            {
+                postList.Insert(0, createdPost);
+            }
+
+            // Initialize DTO for the new post's comments and set initial count
+            newCommentDtos[createdPost.Id] = new CreateCommentDto
+            {
+                UserId = PostService.GetCurrentUserId(),
+                PostId = createdPost.Id
+            };
+            commentCounts[createdPost.Id] = 0;
+
+
+            // Reset form
+            newPostDto = new CreatePostDto();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating post: {ex.Message}");
+            // Handle error, e.g., display a message to the user (not using alert/confirm)
+        }
+        finally
+        {
+            // Since we updated the posts list directly, we need to manually trigger a UI update.
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleNewComment(int postId)
+    {
+        // The DTO model is already initialized with UserId and PostId in LoadPosts().
+        var dto = newCommentDtos[postId];
+
+        // 1. Create the comment
+        try
+        {
+            var newComment = await PostService.CreateCommentAsync(dto);
+
+            // 2. Update the UI in real-time
+            if (visibleComments.ContainsKey(postId))
+            {
+                visibleComments[postId].Add(newComment);
+            }
+            commentCounts[postId]++;
+
+            // 3. Reset the comment form for this post
+            newCommentDtos[postId] = new CreateCommentDto
+            {
+                UserId = PostService.GetCurrentUserId(),
+                PostId = postId,
+                Body = string.Empty // Clear the text input
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating comment: {ex.Message}");
+        }
+    }
+}

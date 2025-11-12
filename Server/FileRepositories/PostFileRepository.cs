@@ -12,6 +12,13 @@ public class PostFileRepository : IPostRepository
         JsonHelper.EnsureInitialized(filepath);
     }
 
+    //constructor that takes a specific filepath, to make things more organized
+    public PostFileRepository(string path)
+    {
+        filepath = path;
+        JsonHelper.EnsureInitialized(filepath);
+    }
+
     public async Task<Post> AddAsync(Post post)
     {
         var posts = await JsonHelper.LoadListAsync<Post>(filepath);
