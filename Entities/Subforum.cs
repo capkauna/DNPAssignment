@@ -14,6 +14,8 @@ public class Subforum
         this.postId = post.Id;
     }
 
+    private Subforum(){} //added based on recommendation, for EFC. this class has been abandoned, but since I'm here already...
+
     public void AddPost(Post post)
     {
         Posts.Add(post);

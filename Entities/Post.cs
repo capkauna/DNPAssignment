@@ -35,6 +35,8 @@ public class Post
     }
     */
 
+    private Post(){} //added based on recommendation, for EFC
+
 
     public bool AddLike(int userId)    => LikedBy.Add(userId);
     public bool RemoveLike(int userId) => LikedBy.Remove(userId);

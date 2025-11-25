@@ -12,4 +12,5 @@ public class User
         UserName = userName;
         Password = password;
     }
+    private User(){} //added based on recommendation, for EFC.
 }

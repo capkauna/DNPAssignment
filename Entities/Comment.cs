@@ -26,6 +26,7 @@ public class Comment
         PostId = postId;
         Body = body;
     }
+    private Comment(){} //added based on recommendation, for EFC
 
     public void AddLike(int userId) => LikedBy.Add(userId);
     public void RemoveLike(int userId) => LikedBy.Remove(userId);

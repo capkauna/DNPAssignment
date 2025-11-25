@@ -1,4 +1,5 @@
-﻿using FileRepositories;
+﻿using EfcRepositories;
+using FileRepositories;
 using RepositoryContracts;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +30,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-*/
+
 
 //better version with declared paths
 var dataDir = Path.Combine(builder.Environment.ContentRootPath, "data");
@@ -41,6 +42,16 @@ builder.Services.AddScoped<IPostRepository>(_ =>
     new PostFileRepository(Path.Combine(dataDir, "posts.json")));
 builder.Services.AddScoped<ICommentRepository>(_ =>
     new CommentFileRepository(Path.Combine(dataDir, "comments.json")));
+*/
+
+//switching to EFC repositories
+builder.Services.AddDbContext<EfcRepositories.AppContext>();
+
+//using EF Core + SQLite
+builder.Services.AddScoped<IPostRepository, EfcPostRepository>();
+builder.Services.AddScoped<IUserRepository, EfcUserRepository>();
+builder.Services.AddScoped<ICommentRepository, EfcCommentRepository>();
+
 
 var app = builder.Build();
 
